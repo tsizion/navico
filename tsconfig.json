@@ -1,6 +1,9 @@
 {
   "files": [],
-  "references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.node.json" }],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ],
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
@@ -10,6 +13,7 @@
     "noUnusedParameters": false,
     "skipLibCheck": true,
     "allowJs": true,
+    "jsx": "react-jsx", // ✅ standard React JSX transform
     "noUnusedLocals": false,
     "strictNullChecks": false
   }
