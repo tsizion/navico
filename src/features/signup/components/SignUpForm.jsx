@@ -4,14 +4,14 @@ import { Input } from "@/components/ui/input";
 import { FileUploadUI } from "../../fileupload/components/FileUpload";
 import { signupUserUseCase } from "../usecase/signupUseCase";
 
-export const SignUpForm = () => {
+export const SignUpForm = ({ onSuccess }) => {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
     phoneNumber: "",
     password: "",
-    profilePicture: null, // will store uploaded URL
+    profilePicture: null,
   });
 
   const [loading, setLoading] = useState(false);
@@ -22,7 +22,6 @@ export const SignUpForm = () => {
   };
 
   const handleFileSelect = (fileUrl) => {
-    // fileUrl comes from FileUploadUI after successful upload
     setFormData({ ...formData, profilePicture: fileUrl });
   };
 
@@ -37,22 +36,15 @@ export const SignUpForm = () => {
         profilePicture: formData.profilePicture || "default-profile.jpg",
       };
 
-      // Call the use case to create user
-      const createdUser = await signupUserUseCase(payload);
-      console.log("User created:", createdUser);
+      console.log("✉️ [SignUpForm] Submitting email:", formData.email);
 
-      alert("User created successfully!");
-      // Optionally reset form
-      setFormData({
-        firstName: "",
-        lastName: "",
-        email: "",
-        phoneNumber: "",
-        password: "",
-        profilePicture: null,
-      });
+      const createdUser = await signupUserUseCase(payload);
+      console.log("🎉 [SignUpForm] User created:", createdUser);
+
+      // Pass email to parent to show OTP component
+      onSuccess && onSuccess(formData.email);
     } catch (err) {
-      console.error(err);
+      console.error("❌ [SignUpForm] Signup failed:", err.message);
       setError(err.message || "Signup failed. Please try again.");
     } finally {
       setLoading(false);
