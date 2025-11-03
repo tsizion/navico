@@ -4,6 +4,7 @@ export const ApiEndpoints = {
   // User
   getUser: "/user", // GET user info
   updateUser: "/user/update", // PATCH/PUT user info
+  signup: "/user", // GET user info
 
   // Expert
   getExperts: "/expert", // GET all experts

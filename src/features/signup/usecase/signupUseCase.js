@@ -1,9 +1,11 @@
-import { authRepository } from "../repositories/authRepository";
+// src/features/user/usecase/signupUseCase.js
 
-export const signupUseCase = async (userData) => {
-  if (userData.password.length < 6) {
-    throw new Error("Password must be at least 6 characters");
-  }
-  const user = await authRepository.signupUser(userData);
-  return user;
+import { UserRepository } from "../repositories/authRepository";
+import { User } from "../entities/User";
+
+const userRepo = new UserRepository();
+
+export const signupUserUseCase = async (userData) => {
+  const user = new User(userData); // create User entity
+  return await userRepo.signup(user); // call repository
 };
