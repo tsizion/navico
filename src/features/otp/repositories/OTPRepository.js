@@ -1,5 +1,4 @@
 // src/features/otp/repositories/OTPRepository.js
-
 import { ApiEndpoints } from "../../../services/apiConstants";
 import { apiService } from "../../../services/apiService";
 
@@ -13,9 +12,10 @@ export class OTPRepository {
 
       const response = await apiService.post(ApiEndpoints.verifyOTP, payload);
 
-      if (response?.status === "success" || response?.statusCode === 200) {
+      if (response?.status === "success") {
         console.log("[OTP Verify] Success:", response);
-        return true;
+        // ✅ Return the full response including token and user
+        return response;
       } else {
         console.warn("[OTP Verify] Failed:", response);
         throw new Error(response?.message || "OTP verification failed");
@@ -32,7 +32,7 @@ export class OTPRepository {
 
       if (response?.status === "success") {
         console.log("[OTP Resend] Success:", response);
-        return true;
+        return response;
       } else {
         throw new Error(response?.message || "Failed to resend OTP");
       }

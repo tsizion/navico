@@ -1,5 +1,6 @@
 export class User {
-  constructor({ firstName, lastName, email, phoneNumber, password, profilePicture }) {
+  constructor({ id = null, firstName, lastName, email, phoneNumber, password, profilePicture }) {
+    this.id = id; // optional
     this.firstName = firstName;
     this.lastName = lastName;
     this.email = email;

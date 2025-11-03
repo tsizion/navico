@@ -5,6 +5,7 @@ import {
   verifyOTPUseCase,
 } from "../usecases/verifyOTPUseCase";
 import { useToast } from "@/hooks/use-toast";
+import { User } from "../../signup/entities/User";
 
 export const VerifyOTP = ({ email, onVerify }) => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -15,7 +16,7 @@ export const VerifyOTP = ({ email, onVerify }) => {
   const [resendCount, setResendCount] = useState(0);
 
   const inputsRef = useRef([]);
-  const { toast } = useToast(); // use your custom toast
+  const { toast } = useToast();
 
   // Countdown timer effect
   useEffect(() => {
@@ -26,7 +27,7 @@ export const VerifyOTP = ({ email, onVerify }) => {
       setResendTimer((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          setCanResend(resendCount < 3); // enable only if attempts < 3
+          setCanResend(resendCount < 3);
           return 0;
         }
         return prev - 1;
@@ -36,8 +37,25 @@ export const VerifyOTP = ({ email, onVerify }) => {
     return () => clearInterval(timer);
   }, [email, resendCount]);
 
+  // Handle typing / paste
   const handleChange = (e, index) => {
-    const value = e.target.value.replace(/\D/, "");
+    const value = e.target.value.replace(/\D/g, "");
+
+    // Paste multiple digits
+    if (value.length > 1) {
+      const newOtp = value.split("").slice(0, 6);
+      setOtp((prev) => {
+        const updated = [...prev];
+        newOtp.forEach((v, i) => {
+          if (i < 6) updated[i] = v;
+        });
+        return updated;
+      });
+      const lastIndex = Math.min(newOtp.length - 1, 5);
+      inputsRef.current[lastIndex].focus();
+      return;
+    }
+
     if (!value) return;
 
     const newOtp = [...otp];
@@ -47,10 +65,42 @@ export const VerifyOTP = ({ email, onVerify }) => {
     if (index < 5) inputsRef.current[index + 1].focus();
   };
 
+  // Backspace handling
   const handleKeyDown = (e, index) => {
-    if (e.key === "Backspace" && !otp[index] && index > 0) {
-      inputsRef.current[index - 1].focus();
+    if (e.key === "Backspace") {
+      e.preventDefault();
+      const newOtp = [...otp];
+
+      if (newOtp[index]) {
+        // Clear current box
+        newOtp[index] = "";
+        setOtp(newOtp);
+      } else if (index > 0) {
+        // Move back and clear previous
+        inputsRef.current[index - 1].focus();
+        newOtp[index - 1] = "";
+        setOtp(newOtp);
+      }
     }
+  };
+
+  // Paste handling
+  const handlePaste = (e) => {
+    e.preventDefault();
+    const pasteData = e.clipboardData
+      .getData("Text")
+      .replace(/\D/g, "")
+      .slice(0, 6);
+    if (!pasteData) return;
+
+    const newOtp = [...otp];
+    pasteData.split("").forEach((v, i) => {
+      if (i < 6) newOtp[i] = v;
+    });
+    setOtp(newOtp);
+
+    const lastIndex = Math.min(pasteData.length - 1, 5);
+    inputsRef.current[lastIndex].focus();
   };
 
   const handleSubmit = async (e) => {
@@ -68,9 +118,31 @@ export const VerifyOTP = ({ email, onVerify }) => {
 
     setLoading(true);
     try {
-      await verifyOTPUseCase({ email, code: otpCode });
-      toast({ title: "Success ✅", description: "OTP verified successfully!" });
-      onVerify(otpCode);
+      const response = await verifyOTPUseCase({ email, code: otpCode });
+
+      const user = new User({
+        id: response.user._id,
+        firstName: response.user.firstName,
+        lastName: response.user.lastName,
+        email: response.user.email,
+        phoneNumber: response.user.phoneNumber,
+        password: response.user.password || "",
+        profilePicture: response.user.profilePicture,
+      });
+
+      // Save token and user
+      localStorage.setItem("authToken", response.token);
+      localStorage.setItem("user", JSON.stringify(user));
+
+      console.log("Token saved:", localStorage.getItem("authToken"));
+      console.log("User saved:", JSON.parse(localStorage.getItem("user")));
+
+      toast({
+        title: "Success ✅",
+        description: `Email ${user.email} verified successfully!`,
+      });
+
+      onVerify && onVerify(otpCode);
     } catch (err) {
       toast({
         title: "Verification Failed ❌",
@@ -101,7 +173,7 @@ export const VerifyOTP = ({ email, onVerify }) => {
       });
       setResendCount(resendCount + 1);
       setCanResend(false);
-      setResendTimer(30); // restart countdown
+      setResendTimer(30);
     } catch (err) {
       toast({
         title: "Resend Failed ❌",
@@ -137,6 +209,7 @@ export const VerifyOTP = ({ email, onVerify }) => {
               value={digit}
               onChange={(e) => handleChange(e, index)}
               onKeyDown={(e) => handleKeyDown(e, index)}
+              onPaste={handlePaste}
               className="w-12 h-12 text-center border rounded-lg text-lg focus:outline-none focus:border-primary"
             />
           ))}
