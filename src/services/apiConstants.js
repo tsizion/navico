@@ -2,29 +2,30 @@ export const API_BASE_URL = "https://expertly-1.onrender.com/api/v1";
 
 export const ApiEndpoints = {
   // User
-  getUser: "/user",                 // GET user info
-  updateUser: "/user/update",       // PATCH/PUT user info
+  getUser: "/user", // GET user info
+  updateUser: "/user/update", // PATCH/PUT user info
 
   // Expert
-  getExperts: "/expert",            // GET all experts
+  getExperts: "/expert", // GET all experts
   getExpertById: (id) => `/expert/${id}`,
-  createExpert: "/expert",          // POST new expert
+  createExpert: "/expert", // POST new expert
 
   // Client
-  getClients: "/client",            // GET all clients
+  getClients: "/client", // GET all clients
   getClientById: (id) => `/client/${id}`,
-  createClient: "/client",          // POST new client
+  createClient: "/client", // POST new client
 
   // Admin
   getAdmins: "/admin",
-  adminAction: "/admin/action",     // example placeholder
+  adminAction: "/admin/action", // example placeholder
 
   // Authentication
   login: "/login",
   logout: "/logout",
 
   // File Upload
-  uploadFile: "/file/upload",
+  uploadSingleFile: "/file/upload/single",
+  uploadMultipleFiles: "/file/upload/multiple",
   getFile: (filename) => `/file/${filename}`,
 
   // Category

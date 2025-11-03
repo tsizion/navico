@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { FileUploadUI } from "../../fileupload/components/FileUpload";
 
 export const SignUpForm = () => {
   const [formData, setFormData] = useState({
@@ -9,12 +10,18 @@ export const SignUpForm = () => {
     email: "",
     phoneNumber: "",
     password: "",
+    profilePicture: null,
   });
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleFileSelect = (file) => {
+    setFormData({ ...formData, profilePicture: file });
   };
 
   const handleSubmit = async (e) => {
@@ -23,10 +30,17 @@ export const SignUpForm = () => {
     setError(null);
 
     try {
-      // Later, connect this to signupUseCase
-      console.log("Signing up:", formData);
+      const payload = {
+        ...formData,
+        profilePicture: formData.profilePicture || "default-profile.jpg",
+      };
+
+      console.log("👤 Creating User:", payload);
       await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      alert("User created successfully!");
     } catch (err) {
+      console.error(err);
       setError("Signup failed. Please try again.");
     } finally {
       setLoading(false);
@@ -38,14 +52,12 @@ export const SignUpForm = () => {
       <Input
         name="firstName"
         placeholder="First Name"
-        value={formData.firstName}
         onChange={handleChange}
         required
       />
       <Input
         name="lastName"
         placeholder="Last Name"
-        value={formData.lastName}
         onChange={handleChange}
         required
       />
@@ -53,14 +65,12 @@ export const SignUpForm = () => {
         name="email"
         placeholder="Email"
         type="email"
-        value={formData.email}
         onChange={handleChange}
         required
       />
       <Input
         name="phoneNumber"
         placeholder="Phone Number"
-        value={formData.phoneNumber}
         onChange={handleChange}
         required
       />
@@ -68,9 +78,14 @@ export const SignUpForm = () => {
         name="password"
         placeholder="Password"
         type="password"
-        value={formData.password}
         onChange={handleChange}
         required
+      />
+
+      <FileUploadUI
+        onFileSelect={(file) =>
+          setFormData({ ...formData, profilePicture: file })
+        }
       />
 
       <Button type="submit" className="w-full" disabled={loading}>
