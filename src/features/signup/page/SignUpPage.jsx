@@ -4,10 +4,13 @@ import { VerifyOTP } from "../../otp/components/VerifyOTP";
 import navicoLogo from "@/assets/navico-logo.png";
 import navicoLogoWhite from "@/assets/navico-logo-white.png";
 import { LoginForm } from "../components/LoginForm";
+import { useToast } from "@/hooks/use-toast"; // import custom toast
 
 export const SignUpPage = () => {
   const [view, setView] = useState("signup"); // "signup", "otp", "login"
   const [emailForOTP, setEmailForOTP] = useState(null);
+
+  const { toast } = useToast(); // toast instance
 
   const handleSignupSuccess = (email) => {
     console.log("✅🎉 Signup Success! Email received:", email);
@@ -18,7 +21,13 @@ export const SignUpPage = () => {
 
   const handleOTPVerify = (otp) => {
     console.log(`🔒🛡 OTP entered for ${emailForOTP}: ${otp}`);
-    alert("🎊 OTP Verified Successfully!");
+
+    // ✅ Use custom toast instead of alert
+    toast({
+      title: "OTP Verified ✅",
+      description: `Email ${emailForOTP} verified successfully!`,
+    });
+
     setView("signup"); // reset to signup or redirect
     setEmailForOTP(null);
     console.log("🔁 Resetting view to signup and clearing emailForOTP...");

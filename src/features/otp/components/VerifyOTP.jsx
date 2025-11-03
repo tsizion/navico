@@ -4,35 +4,37 @@ import {
   resendOTPUseCase,
   verifyOTPUseCase,
 } from "../usecases/verifyOTPUseCase";
+import { useToast } from "@/hooks/use-toast";
 
 export const VerifyOTP = ({ email, onVerify }) => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [loading, setLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [resendTimer, setResendTimer] = useState(30); // countdown in seconds
+  const [resendTimer, setResendTimer] = useState(30);
   const [canResend, setCanResend] = useState(false);
+  const [resendCount, setResendCount] = useState(0);
 
   const inputsRef = useRef([]);
+  const { toast } = useToast(); // use your custom toast
 
+  // Countdown timer effect
   useEffect(() => {
-    // Start countdown when OTP screen mounts
     setCanResend(false);
     setResendTimer(30);
 
-    const timerInterval = setInterval(() => {
+    const timer = setInterval(() => {
       setResendTimer((prev) => {
         if (prev <= 1) {
-          clearInterval(timerInterval);
-          setCanResend(true); // enable resend button
+          clearInterval(timer);
+          setCanResend(resendCount < 3); // enable only if attempts < 3
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
 
-    return () => clearInterval(timerInterval);
-  }, [email]); // reset timer if email changes
+    return () => clearInterval(timer);
+  }, [email, resendCount]);
 
   const handleChange = (e, index) => {
     const value = e.target.value.replace(/\D/, "");
@@ -54,48 +56,58 @@ export const VerifyOTP = ({ email, onVerify }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const otpCode = otp.join("");
+
     if (otpCode.length !== 6) {
-      alert("Enter a 6-digit OTP");
+      toast({
+        title: "OTP Error ❌",
+        description: "Enter a 6-digit OTP",
+        variant: "destructive",
+      });
       return;
     }
 
     setLoading(true);
-    setError(null);
-
     try {
       await verifyOTPUseCase({ email, code: otpCode });
+      toast({ title: "Success ✅", description: "OTP verified successfully!" });
       onVerify(otpCode);
     } catch (err) {
-      setError(err.message || "OTP verification failed");
+      toast({
+        title: "Verification Failed ❌",
+        description: err.message || "OTP verification failed",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
   };
 
   const handleResend = async () => {
-    setResendLoading(true);
-    setError(null);
+    if (resendCount >= 3) {
+      toast({
+        title: "Max Resends ⚠️",
+        description: "You have reached the maximum number of OTP resends",
+        variant: "destructive",
+      });
+      return;
+    }
 
+    setResendLoading(true);
     try {
       await resendOTPUseCase(email);
-      alert("OTP resent successfully!");
-      console.log("🔄 OTP resent");
-
-      // Reset timer
+      toast({
+        title: "OTP Sent 🔄",
+        description: "A new OTP has been sent to your email",
+      });
+      setResendCount(resendCount + 1);
       setCanResend(false);
-      setResendTimer(30);
-      const timerInterval = setInterval(() => {
-        setResendTimer((prev) => {
-          if (prev <= 1) {
-            clearInterval(timerInterval);
-            setCanResend(true);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
+      setResendTimer(30); // restart countdown
     } catch (err) {
-      setError(err.message || "Failed to resend OTP");
+      toast({
+        title: "Resend Failed ❌",
+        description: err.message || "Failed to resend OTP",
+        variant: "destructive",
+      });
     } finally {
       setResendLoading(false);
     }
@@ -130,8 +142,6 @@ export const VerifyOTP = ({ email, onVerify }) => {
           ))}
         </div>
 
-        {error && <p className="text-red-500 text-sm text-center">{error}</p>}
-
         <Button type="submit" className="w-full mt-4" disabled={loading}>
           {loading ? "Verifying..." : "Verify OTP"}
         </Button>
@@ -149,7 +159,7 @@ export const VerifyOTP = ({ email, onVerify }) => {
           {resendLoading
             ? "Resending..."
             : canResend
-            ? "Resend OTP"
+            ? `Resend OTP (${resendCount + 1}/3)`
             : `Resend in ${resendTimer}s`}
         </button>
       </form>
