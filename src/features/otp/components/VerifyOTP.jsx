@@ -128,6 +128,7 @@ export const VerifyOTP = ({ email, onVerify }) => {
         phoneNumber: response.user.phoneNumber,
         password: response.user.password || "",
         profilePicture: response.user.profilePicture,
+        emailVerified: response.user.emailVerified, // Set emailVerified to true after OTP verification
       });
 
       // Save token and user

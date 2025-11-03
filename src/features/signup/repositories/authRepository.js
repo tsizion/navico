@@ -31,4 +31,30 @@ export class UserRepository {
       throw err;
     }
   }
+  async login({ email, phoneNumber, password }) {
+    try {
+      const payload = { email, phoneNumber, password };
+      const response = await apiService.post(ApiEndpoints.login, payload);
+
+      if (response?.status === "success") {
+        // Create a User entity from response.user and attach token
+        const user = new User({
+          id: response.user._id,
+          firstName: response.user.firstName,
+          lastName: response.user.lastName,
+          email: response.user.email,
+          phoneNumber: response.user.phoneNumber,
+          profilePicture: response.user.profilePicture,
+          emailVerified: response.user.emailVerified,
+          token: response.token, // optional token
+        });
+
+        return { user, role: response.role, token: response.token };
+      } else {
+        throw new Error(response?.message || "Login failed");
+      }
+    } catch (err) {
+      throw err;
+    }
+  }
 }

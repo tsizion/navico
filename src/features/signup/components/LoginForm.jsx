@@ -1,17 +1,18 @@
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast"; // import your custom toast
+import { useToast } from "@/hooks/use-toast";
+import { loginUserUseCase } from "../usecase/loginusecase";
 
 export const LoginForm = ({ onLoginSuccess }) => {
   const [formData, setFormData] = useState({
-    email: "",
+    identifier: "", // can be email or phone number
     password: "",
   });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const { toast } = useToast(); // use custom toast
+  const { toast } = useToast();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -23,32 +24,32 @@ export const LoginForm = ({ onLoginSuccess }) => {
     setError(null);
 
     try {
-      // TODO: Replace with your login use case / API call
-      console.log("Logging in with:", formData);
+      // Determine if identifier is email or phone
+      const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.identifier);
+      const loginPayload = isEmail
+        ? { email: formData.identifier, password: formData.password }
+        : { phoneNumber: formData.identifier, password: formData.password };
 
-      // Simulate API call
-      setTimeout(() => {
-        setLoading(false);
-        
-        // Success toast
-        toast({
-          title: "Login Successful ✅",
-          description: `Welcome back, ${formData.email}!`,
-        });
+      const { user, role, token } = await loginUserUseCase(loginPayload);
 
-        onLoginSuccess && onLoginSuccess();
-      }, 1000);
-    } catch (err) {
-      console.error(err);
-      setError(err.message || "Login failed. Please try again.");
+      // Save token and user
+      localStorage.setItem("authToken", token);
+      localStorage.setItem("user", JSON.stringify(user));
 
-      // Error toast
       toast({
-        title: "Login Failed ❌",
-        description: err.message || "Invalid credentials",
-        variant: "destructive",
+        title: "Login Successful ✅",
+        description: `Welcome back, ${user.firstName}!`,
       });
 
+      onLoginSuccess && onLoginSuccess(user);
+    } catch (err) {
+      setError(err.message);
+      toast({
+        title: "Login Failed ❌",
+        description: err.message,
+        variant: "destructive",
+      });
+    } finally {
       setLoading(false);
     }
   };
@@ -56,10 +57,10 @@ export const LoginForm = ({ onLoginSuccess }) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <Input
-        name="email"
-        type="email"
-        placeholder="Email"
-        value={formData.email}
+        name="identifier"
+        type="text"
+        placeholder="Email or Phone Number"
+        value={formData.identifier}
         onChange={handleChange}
         required
       />
