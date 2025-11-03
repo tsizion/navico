@@ -6,6 +6,7 @@ export const ApiEndpoints = {
   updateUser: "/user/update", // PATCH/PUT user info
   signup: "/user", // GET user info
   verifyOTP: "/user/verify-otp", // GET user info
+  resendOTP: "/user/resend-otp", // GET user info
 
   // Expert
   getExperts: "/expert", // GET all experts

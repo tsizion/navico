@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   resendOTPUseCase,
@@ -10,7 +10,29 @@ export const VerifyOTP = ({ email, onVerify }) => {
   const [loading, setLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [resendTimer, setResendTimer] = useState(30); // countdown in seconds
+  const [canResend, setCanResend] = useState(false);
+
   const inputsRef = useRef([]);
+
+  useEffect(() => {
+    // Start countdown when OTP screen mounts
+    setCanResend(false);
+    setResendTimer(30);
+
+    const timerInterval = setInterval(() => {
+      setResendTimer((prev) => {
+        if (prev <= 1) {
+          clearInterval(timerInterval);
+          setCanResend(true); // enable resend button
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timerInterval);
+  }, [email]); // reset timer if email changes
 
   const handleChange = (e, index) => {
     const value = e.target.value.replace(/\D/, "");
@@ -20,9 +42,7 @@ export const VerifyOTP = ({ email, onVerify }) => {
     newOtp[index] = value;
     setOtp(newOtp);
 
-    if (index < 5) {
-      inputsRef.current[index + 1].focus();
-    }
+    if (index < 5) inputsRef.current[index + 1].focus();
   };
 
   const handleKeyDown = (e, index) => {
@@ -44,7 +64,7 @@ export const VerifyOTP = ({ email, onVerify }) => {
 
     try {
       await verifyOTPUseCase({ email, code: otpCode });
-      onVerify(otpCode); // call parent callback
+      onVerify(otpCode);
     } catch (err) {
       setError(err.message || "OTP verification failed");
     } finally {
@@ -59,6 +79,21 @@ export const VerifyOTP = ({ email, onVerify }) => {
     try {
       await resendOTPUseCase(email);
       alert("OTP resent successfully!");
+      console.log("🔄 OTP resent");
+
+      // Reset timer
+      setCanResend(false);
+      setResendTimer(30);
+      const timerInterval = setInterval(() => {
+        setResendTimer((prev) => {
+          if (prev <= 1) {
+            clearInterval(timerInterval);
+            setCanResend(true);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
     } catch (err) {
       setError(err.message || "Failed to resend OTP");
     } finally {
@@ -104,10 +139,18 @@ export const VerifyOTP = ({ email, onVerify }) => {
         <button
           type="button"
           onClick={handleResend}
-          className="text-sm mt-2 text-primary hover:underline"
-          disabled={resendLoading}
+          disabled={!canResend || resendLoading}
+          className={`text-sm mt-2 font-medium ${
+            canResend
+              ? "text-primary hover:underline"
+              : "text-gray-400 cursor-not-allowed"
+          }`}
         >
-          {resendLoading ? "Resending..." : "Resend OTP"}
+          {resendLoading
+            ? "Resending..."
+            : canResend
+            ? "Resend OTP"
+            : `Resend in ${resendTimer}s`}
         </button>
       </form>
     </div>
