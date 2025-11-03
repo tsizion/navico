@@ -3,16 +3,17 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { loginUserUseCase } from "../usecase/loginusecase";
+import { useNavigate } from "react-router-dom"; // 👈 import useNavigate
 
 export const LoginForm = ({ onLoginSuccess }) => {
   const [formData, setFormData] = useState({
     identifier: "", // can be email or phone number
     password: "",
   });
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const { toast } = useToast();
+  const navigate = useNavigate(); // 👈 initialize navigate
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -24,7 +25,6 @@ export const LoginForm = ({ onLoginSuccess }) => {
     setError(null);
 
     try {
-      // Determine if identifier is email or phone
       const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.identifier);
       const loginPayload = isEmail
         ? { email: formData.identifier, password: formData.password }
@@ -41,7 +41,11 @@ export const LoginForm = ({ onLoginSuccess }) => {
         description: `Welcome back, ${user.firstName}!`,
       });
 
+      // Call parent callback
       onLoginSuccess && onLoginSuccess(user);
+
+      // 👇 Navigate to dashboard or any route
+      navigate("/"); // change "/dashboard" to your desired route
     } catch (err) {
       setError(err.message);
       toast({
