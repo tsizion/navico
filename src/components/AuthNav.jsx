@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { Bell, HelpCircle } from "lucide-react";
 
 const AuthNav = ({ user }) => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -17,9 +18,9 @@ const AuthNav = ({ user }) => {
   }, []);
 
   return (
-    <div className="flex items-center gap-4  ">
+    <div className="flex items-center w-full gap-4">
       {/* Search Bar */}
-      <div className="relative flex-1 max-w-md">
+      <div className="flex-1 max-w-md relative">
         <input
           type="text"
           placeholder="Search..."
@@ -28,6 +29,16 @@ const AuthNav = ({ user }) => {
         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
           🔍
         </span>
+      </div>
+
+      {/* Icons */}
+      <div className="flex items-center gap-3">
+        <button className="p-2 rounded-full hover:bg-gray-100">
+          <Bell className="w-5 h-5 text-gray-600" />
+        </button>
+        <button className="p-2 rounded-full hover:bg-gray-100">
+          <HelpCircle className="w-5 h-5 text-gray-600" />
+        </button>
       </div>
 
       {/* Start Consulting Button */}

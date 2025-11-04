@@ -70,7 +70,7 @@ const Index = () => {
 
   // Authenticated view (example: show dashboard instead of Hero/CTA)
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen py-20">
       <Navigation />
       <div className="p-8">
         <h1 className="text-2xl font-bold">

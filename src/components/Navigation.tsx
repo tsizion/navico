@@ -21,7 +21,7 @@ const Navigation = () => {
         return;
       }
       try {
-        const data = await validateTokenService();
+        await validateTokenService();
         const user = JSON.parse(localStorage.getItem("user"));
         setAuth({ loading: false, isAuthenticated: true, user });
       } catch {
@@ -42,21 +42,23 @@ const Navigation = () => {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
-      <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-        {/* Logo */}
-        <div className="flex items-center gap-2">
+      <div className="container mx-auto px-6 py-4 flex items-center">
+        {/* Logo on the left */}
+        <div className="flex items-center gap-2 mr-10">
           <img src={navicoLogo} alt="Navico" className="h-8 w-auto" />
           <span className="text-xl font-bold text-foreground">Navico</span>
         </div>
 
-        {/* Links / Auth */}
-        {auth.loading ? (
-          <p className="text-sm text-gray-500">Loading...</p>
-        ) : auth.isAuthenticated ? (
-          <AuthNav user={auth.user} onLogout={handleLogout} />
-        ) : (
-          <GuestNav navigate={navigate} />
-        )}
+        {/* Other items can decide their own position */}
+        <div className="flex-1 flex items-center justify-center">
+          {auth.loading ? (
+            <p className="text-sm text-gray-500">Loading...</p>
+          ) : auth.isAuthenticated ? (
+            <AuthNav user={auth.user} onLogout={handleLogout} />
+          ) : (
+            <GuestNav navigate={navigate} />
+          )}
+        </div>
       </div>
     </nav>
   );
