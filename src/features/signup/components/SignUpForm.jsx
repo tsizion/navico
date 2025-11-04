@@ -6,6 +6,7 @@ import { UploadCloud, Loader2, X } from "lucide-react";
 import { signupUserUseCase } from "../usecase/signupUseCase";
 import { uploadSingleFileUseCase } from "../../fileupload/usecase/fileUploadUseCase";
 import { useToast } from "@/hooks/use-toast";
+import { Eye, EyeOff } from "lucide-react";
 
 const fileTypes = ["JPG", "PNG", "JPEG"];
 
@@ -22,6 +23,7 @@ export const SignUpForm = ({ onSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const { toast } = useToast();
+  const [showPassword, setShowPassword] = useState(false); // default invisible
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -105,14 +107,27 @@ export const SignUpForm = ({ onSuccess }) => {
         onChange={handleChange}
         required
       />
-      <Input
-        name="password"
-        placeholder="Password"
-        type="password"
-        value={formData.password}
-        onChange={handleChange}
-        required
-      />
+      <div className="relative">
+        <Input
+          name="password"
+          type={showPassword ? "text" : "password"} // toggles visibility
+          placeholder="Password"
+          value={formData.password}
+          onChange={handleChange}
+          required
+        />
+        <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+        >
+          {showPassword ? (
+            <EyeOff className="w-5 h-5" />
+          ) : (
+            <Eye className="w-5 h-5" />
+          )}
+        </button>
+      </div>
 
       {/* File Upload & Preview */}
       <div className="w-full border-2 border-dashed rounded-xl cursor-pointer bg-gray-50/40 h-44 flex items-center justify-center">

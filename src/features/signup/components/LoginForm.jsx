@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { loginUserUseCase } from "../usecase/loginusecase";
 import { useNavigate } from "react-router-dom"; // 👈 import useNavigate
+import { Eye, EyeOff } from "lucide-react";
 
 export const LoginForm = ({ onLoginSuccess }) => {
   const [formData, setFormData] = useState({
@@ -12,6 +13,8 @@ export const LoginForm = ({ onLoginSuccess }) => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
+
   const { toast } = useToast();
   const navigate = useNavigate(); // 👈 initialize navigate
 
@@ -72,14 +75,27 @@ export const LoginForm = ({ onLoginSuccess }) => {
         onChange={handleChange}
         required
       />
-      <Input
-        name="password"
-        type="password"
-        placeholder="Password"
-        value={formData.password}
-        onChange={handleChange}
-        required
-      />
+      <div className="relative">
+        <Input
+          name="password"
+          type={showPassword ? "text" : "password"} // toggles visibility
+          placeholder="Password"
+          value={formData.password}
+          onChange={handleChange}
+          required
+        />
+        <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+        >
+          {showPassword ? (
+            <EyeOff className="w-5 h-5" />
+          ) : (
+            <Eye className="w-5 h-5" />
+          )}
+        </button>
+      </div>
 
       <Button type="submit" className="w-full" disabled={loading}>
         {loading ? "Logging in..." : "Login"}
