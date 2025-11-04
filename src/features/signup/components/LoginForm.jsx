@@ -31,12 +31,14 @@ export const LoginForm = ({ onLoginSuccess }) => {
         : { phoneNumber: formData.identifier, password: formData.password };
 
       const { user, role, token } = await loginUserUseCase(loginPayload);
-      console.log("Token saved:", localStorage.getItem("authToken"));
-      console.log("User saved:", JSON.parse(localStorage.getItem("user")));
 
       // Save token and user
       localStorage.setItem("authToken", token);
       localStorage.setItem("user", JSON.stringify(user));
+
+      // Now log after saving
+      console.log("Token saved:", localStorage.getItem("authToken"));
+      console.log("User saved:", JSON.parse(localStorage.getItem("user")));
 
       toast({
         title: "Login Successful ✅",

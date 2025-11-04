@@ -5,7 +5,8 @@ import { apiService } from "./apiService";
 
 export const validateTokenService = async () => {
   try {
-    const response = await apiService.get(ApiEndpoints.validatetoken);
+    // Pass `true` to ensure Authorization token is sent
+    const response = await apiService.get(ApiEndpoints.validatetoken, {}, true);
     return response; // Already response.data from ApiService 🎯
   } catch (error) {
     console.error("[Token Validation Error]", error);

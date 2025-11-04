@@ -6,6 +6,7 @@ import {
 } from "../usecases/verifyOTPUseCase";
 import { useToast } from "@/hooks/use-toast";
 import { User } from "../../signup/entities/User";
+import { useNavigate } from "react-router-dom";
 
 export const VerifyOTP = ({ email, onVerify }) => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -16,6 +17,7 @@ export const VerifyOTP = ({ email, onVerify }) => {
   const [resendCount, setResendCount] = useState(0);
 
   const inputsRef = useRef([]);
+  const navigate = useNavigate();
   const { toast } = useToast();
 
   // Countdown timer effect
@@ -144,6 +146,9 @@ export const VerifyOTP = ({ email, onVerify }) => {
       });
 
       onVerify && onVerify(otpCode);
+
+      // Navigate to root
+      navigate("/", { replace: true });
     } catch (err) {
       toast({
         title: "Verification Failed ❌",
