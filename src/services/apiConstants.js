@@ -10,7 +10,10 @@ export const ApiEndpoints = {
   validatetoken: "/login/validatetoken", // GET user info
 
   // Expert
+
   getExperts: "/expert", // GET all experts
+  isUserExpert: (userId) => `/expert/status/${userId}`, // ✅ Must match backend route
+
   getExpertById: (id) => `/expert/${id}`,
   createExpert: "/expert", // POST new expert
 
