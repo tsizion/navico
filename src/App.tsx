@@ -1,7 +1,6 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
-import { SignUpPage } from "./features/signup/page/SignUpPage.jsx";
-import { SignInPage } from "./features/signup/page/SignInPage.jsx";
+import { AuthPage } from "./features/signup/page/AuthPage.jsx";
 
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -19,9 +18,9 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/signin" element={<SignInPage />} />
-          <Route path="/signup" element={<SignUpPage />} /> {/* 👈 add this */}
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          {/* Use the same AuthPage component with different defaultView props */}
+          <Route path="/signin" element={<AuthPage defaultView="login" />} />
+          <Route path="/signup" element={<AuthPage defaultView="signup" />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

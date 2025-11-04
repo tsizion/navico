@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FileUploader } from "react-drag-drop-files";
 import { UploadCloud, Loader2, X } from "lucide-react";
-import { uploadSingleFileUseCase } from "../usecase/fileuploadusecase";
+import { uploadSingleFileUseCase } from "../usecase/fileUploadUseCase";
 import { useToast } from "@/hooks/use-toast";
 
 const fileTypes = ["JPG", "PNG", "JPEG"];
