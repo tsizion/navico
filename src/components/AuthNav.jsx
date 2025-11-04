@@ -17,23 +17,23 @@ const AuthNav = ({ user }) => {
   }, []);
 
   return (
-    <div className="flex items-center gap-4">
-      {/* Consultant Button */}
-      <Button size="sm" className="bg-primary text-white hover:bg-primary/90">
-        Consultant
-      </Button>
-
+    <div className="flex items-center gap-4  ">
       {/* Search Bar */}
-      <div className="relative">
+      <div className="relative flex-1 max-w-md">
         <input
           type="text"
           placeholder="Search..."
-          className="pl-3 pr-10 py-1 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+          className="w-full pl-4 pr-10 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
         />
-        <span className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400">
+        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
           🔍
         </span>
       </div>
+
+      {/* Start Consulting Button */}
+      <Button size="sm" className="bg-primary text-white hover:bg-primary/90">
+        Start Consulting
+      </Button>
 
       {/* Profile Picture */}
       <div className="relative" ref={menuRef}>
